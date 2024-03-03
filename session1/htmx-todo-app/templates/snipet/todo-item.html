@@ -1,0 +1,13 @@
+<details>
+  <summary>
+    <span hx-get="/snipet/todo-state/{{ todo.id }}" hx-trigger="load"></span>
+
+    <a href="/?page=/modify-todo/{{ todo.id }}" hx-boost="true">M</a>
+    <h3>
+      {{ todo.title }}
+      <button hx-delete="/delete-todo/{{ todo.id }}" hx-target="#app" hx-confirm="삭제하시겠습까?">D</button>
+    </h3>
+  </summary>
+  <p>{{ todo.description }}</p>
+  <p>{{ todo.modifiedAt }}</p>
+</details>

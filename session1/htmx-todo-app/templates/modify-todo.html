@@ -1,0 +1,9 @@
+<h3>📝 TODO</h3>
+
+<form hx-put="/modify-todo/{{ todo.id }}" hx-target="#app">
+  <div hx-get="/snipet/todo-form?title={{ todo.title }}&description={{ todo.description }}" hx-trigger="load" hx-target="this"></div>
+  <button>Modify</button>
+</form>
+
+<hr />
+<a href="/?page=/todo-list" hx-boost="true">List</a>
