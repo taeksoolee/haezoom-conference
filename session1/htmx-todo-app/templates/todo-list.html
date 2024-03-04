@@ -1,9 +1,16 @@
-<h3>📜 TODO LIST</h3>
+<h3 class="text-xl">
+  TODO LIST
+  <a href="/?page=/add-todo" hx-boost="true" class="text-lg underline text-blue-400">
+    <i class="fa-solid fa-plus"></i>
+  </a>
+</h3>
 
-<a href="/?page=/add-todo" hx-boost="true">Add</a>
+{% if todos.length == 0 %}
+  <h1 class="text-xl text-center p-4 shadow-lg">😣 No Content</h1>
+{% endif %}
 
 {% for todo in todos %}
-  <div style="height: 400px">
+  <div class="h-[200px] shadow-lg my-2 p-2">
     <div hx-get="/snipet/todo-item/{{ todo.id }}" hx-trigger="revealed">
       <div class="htmx-indicator">Loading...</div>
     </div>

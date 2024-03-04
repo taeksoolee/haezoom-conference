@@ -4,6 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { writeFileSync, readFileSync } from 'fs';
 
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 
 /**
@@ -132,6 +137,7 @@ nunjucks.configure('./templates', {
   watch: true
 });
 
+app.use(express.static(resolve(__dirname, 'public')));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
@@ -269,8 +275,11 @@ app.get('/snipet/todo-state/:id', (req, res) => {
   res.render('snipet/todo-state', {
     todo,
     processChecked: todo.state === 'P' ? 'checked' : '',
+    processCls: todo.state === 'P' ? 'text-gray-400' : 'text-gray-100',
     doneChecked: todo.state === 'D' ? 'checked' : '',
+    doneCls: todo.state === 'D' ? 'text-green-400' : 'text-gray-100',
     cancelChecked: todo.state === 'C' ? 'checked' : '',
+    cancelCls: todo.state === 'C' ? 'text-red-400' : 'text-gray-100',
   });
 });
 

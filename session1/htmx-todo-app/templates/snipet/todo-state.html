@@ -1,15 +1,21 @@
 <span>
   <label>
-    <input type="radio" value="P" name="state-{{todo.id}}" {{ processChecked }} hx-patch="/todo-state/{{ todo.id }}/P" hx-target="#app" hx-trigger="click" />
-    P
+    <input class="hidden" type="radio" value="P" name="state-{{todo.id}}" {{ processChecked }} hx-patch="/todo-state/{{ todo.id }}/P" hx-target="#app" hx-trigger="click" />
+    <span class="{{ processCls }}">
+      <i class="fa-solid fa-minus"></i>
+    </span>
   </label>
   <label>
-    <input type="radio" value="D" name="state-{{todo.id}}" {{ doneChecked }} hx-patch="/todo-state/{{ todo.id }}/D" hx-target="#app" hx-trigger="click" />
-    D
+    <input class="hidden" type="radio" value="D" name="state-{{todo.id}}" {{ doneChecked }} hx-patch="/todo-state/{{ todo.id }}/D" hx-target="#app" hx-trigger="click" />
+    <span class="{{ doneCls }}">
+      <i class="fa-solid fa-check"></i>
+    </span>
   </label>
   <label>
-    <input type="radio" value="C" name="state-{{todo.id}}" {{ cancelChecked }} hx-patch="/todo-state/{{ todo.id }}/C" hx-target="#app" hx-trigger="click" />
-    C
+    <input class="hidden" type="radio" value="C" name="state-{{todo.id}}" {{ cancelChecked }} hx-patch="/todo-state/{{ todo.id }}/C" hx-target="#app" hx-trigger="click" />
+    <span class="{{ cancelCls }}">
+      <i class="fa-solid fa-xmark"></i>
+    </span>
   </label>
 </span>
 

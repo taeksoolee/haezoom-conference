@@ -4,15 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TODO APP</title>
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
-<body >
-  <h1>TODO APP</h1>
 
-  <div id="app">
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/tailwind.config.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    summary::marker {
+      font-size: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="text-3xl">🚀 TODO APP</h1>
+
+  <main id="app" class="m-auto w-[200px] sm:w-[300px]">
     <div hx-get="{{ page }}" hx-trigger="load">
       <div class="htmx-indicator">👀 LOADING...</div>
     </div>
-  </div>
+  </main>
 </body>
 </html>

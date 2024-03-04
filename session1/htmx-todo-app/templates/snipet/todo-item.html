@@ -1,13 +1,22 @@
-<details>
-  <summary>
-    <span hx-get="/snipet/todo-state/{{ todo.id }}" hx-trigger="load"></span>
 
-    <a href="/?page=/modify-todo/{{ todo.id }}" hx-boost="true">M</a>
-    <h3>
+<div class="flex justify-between w-full">
+  <div hx-get="/snipet/todo-state/{{ todo.id }}" hx-trigger="load"></div>
+  <div>
+    <a href="/?page=/modify-todo/{{ todo.id }}" hx-boost="true" class="text-blue-400 pl-2">
+      <i class="fa-solid fa-pen"></i>
+    </a>
+    <button hx-delete="/delete-todo/{{ todo.id }}" hx-target="#app" hx-confirm="Delete Todo?" class="text-red-400 pl-2">
+      <i class="fa-solid fa-trash"></i>
+    </button>
+  </div>
+</div>
+
+<details>
+  <summary class="outline-none">
+    <h3 class="text-xl inline-block w-full">
       {{ todo.title }}
-      <button hx-delete="/delete-todo/{{ todo.id }}" hx-target="#app" hx-confirm="삭제하시겠습까?">D</button>
     </h3>
   </summary>
-  <p>{{ todo.description }}</p>
-  <p>{{ todo.modifiedAt }}</p>
+  <p class="text-gray-400">{{ todo.description }}</p>
+  <p class="text-gray-400 text-xs">UpdatedAt: {{ todo.modifiedAt }}</p>
 </details>

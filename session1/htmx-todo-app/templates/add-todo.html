@@ -1,9 +1,14 @@
-<h3>📝 TODO</h3>
+<h3 class="text-xl">
+  ✏️ ADD TODO
+  <a href="/?page=/todo-list" hx-boost="true" class="text-lg underline text-blue-400">
+    <i class="fa-solid fa-list-ul"></i>
+  </a>
+</h3>
 
 <form hx-post="/add-todo" hx-target="#app">
   <div hx-get="/snipet/todo-form" hx-trigger="load" hx-target="this"></div>
-  <button>ADD</button>
+  <input type="hidden" name="state" value="P" />
+  <button class="bg-blue-400 text-blue-50 p-2 mt-2">
+    <i class="fa-solid fa-plus"></i>
+  </button>
 </form>
-
-<hr />
-<a href="/?page=/todo-list" hx-boost="true">List</a>
