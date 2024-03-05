@@ -5,20 +5,24 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon ./app.js",
+    "dev": "nodemon ./app.js --ignore sessions/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/validator": "^13.11.9",
     "nodemon": "^3.1.0"
   },
   "dependencies": {
     "@types/express": "^4.17.21",
+    "axios": "^1.6.7",
     "express": "^4.18.3",
+    "express-session": "^1.18.0",
     "nunjucks": "^3.2.4",
+    "session-file-store": "^1.5.0",
     "uuid": "^9.0.1",
     "validator": "^13.11.0"
   }

@@ -1,0 +1,48 @@
+{% set email = uuid() %}
+{% set emailMessage = uuid() %}
+{% set password = uuid() %}
+{% set passwordMessage = uuid() %}
+
+<article class="d-flex justify-content-center">
+  <div class="card" style="width: 24rem;">
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      <form hx-validate="true" hx-post="/login" hx-target="section" onsubmit="return false" >
+        <div class="mb-3">
+          <label for="{{ email }}" class="form-label">Username</label>
+          <!-- 
+            pattern="[a-zA-Z0-9\._%+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}" 
+            aria-errormessage="이메일 형식으로 입력해주세요."
+            oninvalid="this.setCustomValidity(event.target.getAttribute('aria-errormessage') || '')"
+            oninput="((this['required'] && this.validity.valueMissing) || this.validity.patternMismatch) ? this.classList.add('is-invalid') : this.classList.remove('is-invalid')"
+          -->
+          <input
+            id="{{ email }}"
+            class="form-control"
+            name="username"
+            required
+            autocomplete="off"
+          >
+        </div>
+        <div class="mb-3">
+          <label for="{{ password }}" class="form-label">Password</label>
+          <input
+            id="{{ password }}"
+            class="form-control"
+            name="password"
+            type="password"
+            required
+            oninvalid="this['pattern'] && this.setCustomValidity(event.target.getAttribute('aria-errormessage') || '')"
+            oninput="((this['required'] && this.validity.valueMissing) || this.validity.patternMismatch) ? this.classList.add('is-invalid') : this.classList.remove('is-invalid')"
+            autocomplete="off"
+          >
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="auto">
+          <label class="form-check-label" for="exampleCheck1">auto</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+    </div>
+  </div>
+</article>
