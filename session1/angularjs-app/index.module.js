@@ -6,32 +6,62 @@ const app = angular.module('App', ['ngRoute'])
     REFRESH_KEY: '__refresh',
   })
   .config(function($routeProvider) {
+    console.count('init ::: config');
     $routeProvider
-      .when('/resource-list', { 
+      .when('/', { 
+        templateUrl: './templates/home.htm',
+      })
+      .when('/resource', { 
         templateUrl: './templates/resource-list.htm', 
         controller: 'ResourceListCtrl'
       })
-      .when('/resource-detail/:id', { 
+      .when('/resource/detail/:id', { 
         templateUrl: './templates/resource-detail.htm', 
         controller: 'ResourceDetailCtrl'
+      })
+      .when('/resource/goruping', {
+        templateUrl: './templates/grouping.htm',
+        controller: 'GroupingCtrl',
       })
       .otherwise({
         redirectTo: '/'
       });
   })
-  .run(function($http, $s, $signmanager) {
-    console.count('run');
-    const {access, refresh} = $signmanager.tokens;
-    if (access) {
-      $http.defaults.headers.common.Authorization = `Bearer ${access}`;
-      $s.next({
-        type: 'sign',
-      });
-    } else {
-      $s.next({
-        type: 'unsign',
-      });
+  .run(function($rootScope, $http, $s, $signmanager, config, $q) {
+    console.count('init ::: run');
+
+    $rootScope.metadata = null;
+
+    $rootScope.signed = false;
+    if ($signmanager.isSigned) {
+      $http.defaults.headers.common.Authorization = `Bearer ${$signmanager.access}`;
+      $rootScope.signed = true;
     }
+
+    $s.subscribe({
+      next ({ action, payload }) {
+        if (action === 'sign') {
+          $signmanager.sign(payload);
+          $http.defaults.headers.common.Authorization = `Bearer ${$signmanager.access}`;
+          $rootScope.signed = true;
+
+          $http.get(`${config.API_ORIGIN}/api/list/monitoring/`).then(
+            function success(res) {
+              console.log(res.data);
+            },
+            function failed(err) {
+              console.log(err);
+            }
+          )
+
+        } else if (action === 'unsign') {
+          $signmanager.unsign();
+          $http.defaults.headers.common.Authorization = undefined;
+          $rootScope.signed = false;
+          $rootScope.metadata = null;
+        }
+      },
+    });
   })
   .filter('mask', function() {
     return (input, len=4) => isNaN(Number(input)) ? '-' : String(input).slice(0, len).padStart(len, '0');
@@ -41,8 +71,13 @@ const app = angular.module('App', ['ngRoute'])
       return input || null === null ? replace : input;
     }
   })
+  .filter('nullish', function() {
+    return (input, replace='-') => {
+      return input ?? null === null ? replace : input;
+    }
+  })
   .provider('$s', function() {
-    console.count('init ::: $s');
+    console.count('init ::: provider ::: $s');
     this.$get = function() {
       return new rxjs.Subject();
     };
@@ -98,7 +133,7 @@ const app = angular.module('App', ['ngRoute'])
     }
   })
   .provider('$signmanager', function(config) {
-    console.count('init ::: $signmanager');
+    console.count('init ::: provider ::: $signmanager');
 
     this.$get = function() {
       return new (class SignManager {
@@ -133,9 +168,28 @@ const app = angular.module('App', ['ngRoute'])
           }
         }
 
-        set({access, refresh}) {
+        sign({access, refresh}) {
           this.setAccess(access);
           this.setRefresh(refresh);
+        }
+
+        unsign() {
+          this.removeAccess();
+          this.removeRefresh();
+        }
+
+        get isSigned() {
+          return !!this.access;
+        }
+
+        get info() {
+          if (this.access === null) return null;
+          return KJUR.jws.JWS.parse(this.access)?.payloadObj;
+        }
+
+        get refreshInfo() {
+          if (this.refresh === null) return null;
+          return KJUR.jws.JWS.parse(this.refresh)?.payloadObj;
         }
       })();
     }
@@ -222,17 +276,12 @@ const app = angular.module('App', ['ngRoute'])
       console.log(data);
     })
   })
-  .controller('AuthCtrl', function($scope, $form, $http, config, $signmanager, $signmanager, $u) {
-    $scope.shown = true;
-    if ($signmanager.access) {
-      $scope.shown = false;
-    }
-
+  .controller('AuthCtrl', function($scope, $form, $http, config, $s) {
     $scope.loginFormAlert = '';
     $scope.loginFormData = {
       email: '',
       password: '',
-    }
+    };
 
     $scope.login = function() {
       $scope.loginFormAlert = '';
@@ -253,16 +302,28 @@ const app = angular.module('App', ['ngRoute'])
               access, refresh,
             } = res.data;
 
-            $signmanager.setAccess(access);
-            $signmanager.setRefresh(refresh);
+            $scope.loginFormAlert = '';
+            $scope.loginFormData = {
+              email: '',
+              password: '',
+            };
+            $form.reset($scope, 'loginForm');
+
+            $s.next({
+              action: 'sign',
+              payload: { access, refresh },
+            });
           },
           function failed(err) {
             $scope.loginFormAlert = err.data.message;
           }
         )
+    }
 
-      // $request.sign(Object.fromEntries([...new FormData(window.loginForm).entries()]));
-      // $request.signin(new FormData(window.loginForm))
+    $scope.logout = function() {
+      $s.next({
+        action: 'unsign',
+      });
     }
   })
   .service('resource', function($http, config, $q) {
@@ -270,7 +331,8 @@ const app = angular.module('App', ['ngRoute'])
       return $q(function(resolve, reject) {
         $http({
           method: 'GET',
-          url: `${config.API_ORIGIN}/api/resource/`
+          url: `${config.API_ORIGIN}/api/resource/`,
+          cache: true,
         })
           .then(
             function success(res) {
@@ -300,23 +362,39 @@ const app = angular.module('App', ['ngRoute'])
       })
     }
   })
-  .controller('ResourceCtrl', function($scope, resource, $signmanager) {
+  .controller('ResourceCtrl', function($scope, resource) {
   })
-  .controller('ResourceListCtrl', function($scope, resource, $signmanager, $routeParams, $u) {
-    const page = Number(Number($routeParams.page) || '1');
-    console.log(page);
+  .controller('ResourceListCtrl', function($scope, resource, $signmanager, $routeParams) {
     console.count('init ::: ResourceListCtrl');
+    const page = Number(Number($routeParams.page) || '1');
+    const pageSize = 5;
     $scope.resources = [];
 
+    $scope.data = {
+      list: [],
+      pager: [],
+      cur: page,
+    }
+
+    $scope.loading = false;
+
+    $scope.$watch('resources', function(newVal) {
+      $scope.data.list = newVal.slice(page, page+pageSize);
+      $scope.data.pager = Array.from({length: Math.ceil(newVal.length / pageSize)}).map((_, i) => i+1);
+    });
+
     if ($signmanager.access) {
+      $scope.loading = true;
       resource.findAll()
           .then(
             function(data) {
-              if (Array.isArray(data)) {
-                data.forEach(resource => {
-                  $scope.resources.push(resource);
-                })
-              }
+              $scope.resources = data;
+              $scope.loading = false;
+              // if (Array.isArray(data)) {
+              //   data.forEach(resource => {
+              //     $scope.resources.push(resource);
+              //   })
+              // }
             }
           );
     } else {
@@ -326,7 +404,6 @@ const app = angular.module('App', ['ngRoute'])
   .controller('ResourceDetailCtrl', function($scope, resource, $signmanager, $routeParams) {
     console.count('init ::: ResourceDetailCtrl');
     const id = $routeParams.id;
-    console.log(id);
     $scope.resource = null;
     if ($signmanager.access) {
       resource.findById(id)
@@ -341,4 +418,17 @@ const app = angular.module('App', ['ngRoute'])
     } else {
 
     }
+  })
+  .controller('GroupingCtrl', function($q, $http, config) {
+    $q.all([
+      $http.get(`${config.API_ORIGIN}/api/list/monitoring/`),
+      $http.get(`${config.API_ORIGIN}/api/list/control/`),
+    ]).then(
+        function success(res) {
+          console.log(res.data);
+        },
+      )
+      .catch(function(err) {
+        console.log(err);
+      });
   })

@@ -1,23 +1,33 @@
 <div>
-  <h2>Resource App</h2>
   
-  <!-- pagination -->
   <div>
-    <a href="./#!/resource-list?page=1">1</a>
-    <a href="./#!/resource-list?page=2">2</a>
-    <a href="./#!/resource-list?page=3">3</a>
+    <a href="./#!/resource/goruping">grouping</a>
   </div>
-
+  
+  <div ng-if="loading">Loading...</div>
   <div>
-    <!-- <div>{{resources[0]}}</div> -->
-    <hr />
-    <div ng-repeat="resource in resources" class="resource">
-      <div class="type">[{{ resource.infra.type }}]</div>
-      <div class="name">
-        <a ng-href="./#!/resource-detail/{{resource.id}}">🔗</a>
-        {{ resource.infra.name }}
+    <!-- pagination -->
+    <div>
+      <span ng-repeat="i in data.pager" >
+        <a ng-if="i !== data.cur" ng-href="./#!/resource?page={{ i }}">
+          {{ i }}
+        </a>
+        <a ng-if="i === data.cur">
+          {{ i }}
+        </a>
+      </span>
+    </div>
+
+    <!-- list -->
+    <div>
+      <div ng-repeat="item in data.list" class="resource">
+        <div class="type">[{{ item.infra.type }}]</div>
+        <div class="name">
+          <a ng-href="./#!/resource/detail/{{item.id}}">🔗</a>
+          {{ item.infra.name }}
+        </div>
+        <div class="address">{{ item.infra.address }}</div>
       </div>
-      <div class="address">{{ resource.infra.address }}</div>
     </div>
   </div>
 </div>

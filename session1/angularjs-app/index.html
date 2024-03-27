@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.8.1/rxjs.umd.min.js" integrity="sha512-D9LDs8YUUVa4V9Gl4Zb+xqRAc7RCzooR3+zzebgK2RMu/KU+dh90pbjEEMzPiSyRSGbSp9j1pZnrO4joGa5WEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js" integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -16,51 +17,10 @@
 <body>
   <div ng-app="App" ng-cloak>
     <div ng-controller="MainCtrl">
-      <h1>
-        {{ title }}
-      </h1>
-
-      <!-- CountCtrl -->
-      <div ng-controller="CountCtrl">
-        <h2>Count App</h2>
-        <div>{{ count | mask:5 }}</div>
-        <button ng-click="increase($event)">+</button>
-      </div>
-      <!-- end -->
-      
-      <!-- TodoCtrl -->
-      <div ng-controller="TodoCtrl">
-        <h2>Todo App</h2>
-
-        <button ng-show="!shownForm" ng-click="openTodoForm()">+</button>
-        <form ng-show="shownForm" name="addTodoForm" ng-submit="addTodo()" novalidate>
-          <button type="button" ng-click="closeTodoForm()">x</button>
-          <input name="title" ng-model="newTodo.title" required placeholder="title" ng-class="{error: addTodoForm.title.$dirty && addTodoForm.title.$invalid}" />
-          <input name="description" ng-model="newTodo.description" placeholder="description" ng-class="{error: addTodoForm.title.$dirty && addTodoForm.description.$invalid}" />
-          <button type="submit">Add</button>
-        </form>
-
-        <div ng-repeat="todo in todos">
-          <details>
-            <summary>
-              <input type="checkbox" ng-checked="todo.checked" />
-              {{ todo.title }}
-              <button ng-click="delTodo(todo.id)">x</button>
-            </summary>
-            <p>
-              {{ todo.description | falsy }}
-              {{ todo.updatedAt | date:'yyyy.MM.dd' }}
-            </p>
-          </details>
-        </div>
-      </div>
-      <!-- end -->
-
       <!-- AuthCtrl -->
-      <div ng-controller="AuthCtrl" ng-show="shown">
-        <h2>Auth App</h2>
-
-        <div style="width: 200px;">
+      <div ng-controller="AuthCtrl">
+        <div ng-show="!signed" style="width: 200px;">
+          <h3>Login</h3>
           <form name="loginForm" ng-submit="login()" novalidate>
             <div class="input-group">
               <label for="loginForm__email">email</label>
@@ -80,12 +40,21 @@
             <button type="submit">Login</button>
           </form>
         </div>
+        <div ng-if="signed">
+          <header>
+            <nav>
+              <ul>
+                <li><a href="./#!/">home</a></li>
+                <li><a href="./#!/resource">resource</a></li>
+              </ul>
+            </nav>
+            <button ng-click="logout()">logout</button>
+          </header>
+          <div ng-view></div>
+        </div>
       </div>
 
 
-      <a href="./#!/resource-list">resource-list</a>
-
-      <div ng-view></div>
     </div>
   </div>
 </body>
