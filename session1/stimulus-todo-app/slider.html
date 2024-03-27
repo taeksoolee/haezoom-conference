@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo</title>
+  <script type="module">
+    import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+    window.Stimulus = Application.start()
+
+    Stimulus.register("slideshow", class extends Controller {
+      static targets = [ "slide" ]
+
+      initialize() {
+        this.index = 0
+        this._showCurrentSlide()
+      }
+
+      next() {
+        this.index++
+        this._showCurrentSlide();
+      }
+
+      previous() {
+        this.index--
+        this._showCurrentSlide();
+      }
+
+      get slides() {
+        return this.slideTargets;
+      }
+
+      _showCurrentSlide() {
+        this.slides.forEach((element, index) => {
+          element.hidden = index !== this.index;
+        })
+      }
+    })
+  </script>
+</head>
+<body>
+  <div data-controller="slideshow">
+    <button data-action="slideshow#previous"> ← </button>
+    <button data-action="slideshow#next"> → </button>
+  
+    <div data-slideshow-target="slide" hidden>🐵</div>
+    <div data-slideshow-target="slide" hidden>🙈</div>
+    <div data-slideshow-target="slide" hidden>🙉</div>
+    <div data-slideshow-target="slide" hidden>🙊</div>
+  </div>
+</body>
+</html>

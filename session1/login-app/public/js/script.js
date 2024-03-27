@@ -1,22 +1,108 @@
-function errorHandler(evt) {
-  console.log('htmx:responseError', evt.detail.xhr.status);
+/**
+  * @param {{
+  *  names: string[],
+  *  onvalid(input: HTMLInputElement): void,
+  *  oninvalid(input: HTMLInputElement, type: 'pattern' | 'required'): void,
+  * }} events
+*  */
+function Validator(events) {
+  const {
+    onvalid,
+    oninvalid,
+  } = events;
 
-  if (evt.detail.xhr.status === 401) {
-    Toastify({
-      text: "Unauthorized",
-      duration: 100000,
-      className: "info",
-      // className: "bg-danger",
-      style: {
-        background: "linear-gradient(to right, #00b09b, #96c93d)",
-        // background: '#ff0000',
+  /**
+     * @param  {...HTMLInputElement[]} inputs 
+     */
+  function validate(...inputs) {
+    return inputs.reduce((valid, input) => {
+      return this.check(input) && valid;
+    }, true);
+  }
+
+  /**
+   * set custom invalid message
+   * @attr pattern
+   * @attr aria-errormessage
+   */
+  function setErrorMessage(input) {
+    if (input instanceof HTMLInputElement) {
+      if (input.pattern) {
+        const errormesage = input.getAttribute('aria-errormessage') || '';
+        input.setCustomValidity(errormesage);
       }
-    }).showToast();
+    }
+  }
+
+  /**
+     * @attr required
+     * @attr pattern
+     */
+  function check (input) {
+    if (input instanceof HTMLInputElement) {
+      // input.validity.valueMissing is true if required and has no value
+      if (input.validity.valueMissing) {
+        oninvalid(input, 'required');
+        return false;
+      }
+
+      if (input.validity.patternMismatch) {
+        oninvalid(input, 'pattern');
+        return false;
+      }
+
+      onvalid(input);
+      return true;
+    }
+  }
+
+  return {
+    validate,
+    setErrorMessage,
+    check,
+    handlers: {
+      oninput(event) {
+        check(event.target);
+      },
+      oninvalid(event) {
+        setErrorMessage(event.target);
+      }
+    },
   }
 }
 
-document.addEventListener('htmx:load', () => {
-  console.log('loaded htmx');
-  document.body.removeEventListener('htmx:responseError', errorHandler);
-  document.body.addEventListener('htmx:responseError', errorHandler);
+htmx.on("htmx:load", function(evt) {
+  htmx.config.defaultTransitionDuration = 100;
 });
+
+window.addEventListener('load', function() {
+  window.validator = Validator({
+    onvalid(input) {
+      input.classList.remove('is-invalid');
+      const inputWrapper = input.parentElement;
+      inputWrapper.classList.remove('is-invalid');
+
+      const message = inputWrapper.parentElement.querySelector('div[role=alert]');
+      if (message) {
+        message.classList.remove('invalid-feedback');
+        message.innerText = '';
+      }
+    },
+    oninvalid(input, type) {
+      input.classList.add('is-invalid');
+      const inputWrapper = input.parentElement;
+      inputWrapper.classList.add('is-invalid');
+
+      const message = inputWrapper.parentElement.querySelector('div[role=alert]');
+      if (message) {
+        message.classList.add('invalid-feedback');
+
+        if (type === 'required') {
+          message.innerText = input.getAttribute('aria-required') || '';
+        } else if (type === 'pattern') {
+          message.innerText = input.getAttribute('aria-errormessage') || '';
+        }
+      }
+    }
+  });
+})

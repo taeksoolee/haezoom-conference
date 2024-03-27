@@ -1,48 +1,104 @@
-{% set email = uuid() %}
-{% set emailMessage = uuid() %}
-{% set password = uuid() %}
-{% set passwordMessage = uuid() %}
+<main class="container pt-5">
+  <article class="d-flex justify-content-center">
+    <div class="card" style="width: 24rem;">
+      <!-- <img src="..." class="card-img-top" alt="..."> -->
+      <div class="card-body p-5">
+        <h3 class="mb-5 text-center">🔐 Login</h3>
+        <form 
+          name="loginForm" 
+          novalidate
+          hx-validate="true" 
+          hx-post="/login" 
+          hx-target="section" 
+          hx-on::response-error="
+            const errorContainer = this.querySelector('#errorContainer');
+            if (errorContainer) {
+              errorContainer.innerHTML = event.detail.xhr.response;
+            }
+            const button = this.querySelector('button[type=submit]');
+            button.disabled = false;
+            const [$1, $2] = [...button.querySelectorAll('span')];
+            
+            $1.classList.remove('d-none');
+            $2.classList.add('d-none');
+          "
+          onsubmit="
+            const valid = validator.validate(...[
+              this.username,
+              this.password,
+            ]);
 
-<article class="d-flex justify-content-center">
-  <div class="card" style="width: 24rem;">
-    <!-- <img src="..." class="card-img-top" alt="..."> -->
-    <div class="card-body">
-      <form hx-validate="true" hx-post="/login" hx-target="section" onsubmit="return false" >
-        <div class="mb-3">
-          <label for="{{ email }}" class="form-label">Username</label>
-          <!-- 
-            pattern="[a-zA-Z0-9\._%+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}" 
-            aria-errormessage="이메일 형식으로 입력해주세요."
-            oninvalid="this.setCustomValidity(event.target.getAttribute('aria-errormessage') || '')"
-            oninput="((this['required'] && this.validity.valueMissing) || this.validity.patternMismatch) ? this.classList.add('is-invalid') : this.classList.remove('is-invalid')"
-          -->
-          <input
-            id="{{ email }}"
-            class="form-control"
-            name="username"
-            required
-            autocomplete="off"
-          >
-        </div>
-        <div class="mb-3">
-          <label for="{{ password }}" class="form-label">Password</label>
-          <input
-            id="{{ password }}"
-            class="form-control"
-            name="password"
-            type="password"
-            required
-            oninvalid="this['pattern'] && this.setCustomValidity(event.target.getAttribute('aria-errormessage') || '')"
-            oninput="((this['required'] && this.validity.valueMissing) || this.validity.patternMismatch) ? this.classList.add('is-invalid') : this.classList.remove('is-invalid')"
-            autocomplete="off"
-          >
-        </div>
-        <div class="mb-3 form-check">
-          <input type="checkbox" class="form-check-input" id="auto">
-          <label class="form-check-label" for="exampleCheck1">auto</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-      </form>
+            if (valid) {
+              const button = this.querySelector('button[type=submit]');
+              button.disabled = true;
+              const [$1, $2] = [...button.querySelectorAll('span')];
+              
+              $1.classList.add('d-none');
+              $2.classList.remove('d-none');
+
+              const errorContainer = this.querySelector('#errorContainer');
+              if (errorContainer) {
+                errorContainer.innerHTML = '';
+              }
+            }
+            
+            return valid;
+          "
+        >
+          <div class="input-group has-validation mb-3">
+            <div class="form-floating">
+              <input
+                class="form-control"
+                name="username"
+                placeholder="username"
+                required
+                oninput="validator.handlers.oninput(event)"
+                pattern="^.{5,}"
+                aria-errormessage="5글자 이상 입력하세요."
+                aria-required="값을 입력해주세요."
+                autocomplete="off"
+              >
+              <label class="form-label">username</label>
+            </div>
+            <div role="alert"></div>
+          </div>
+          <div class="input-group has-validation mb-3">
+            <div class="form-floating">
+              <input
+                class="form-control"
+                name="password"
+                type="password"
+                placeholder="password"
+                required
+                oninvalid="validator.setErrorMessage(event.target)"
+                oninput="validator.handlers.oninput(event)"
+                aria-required="값을 입력해주세요."
+                autocomplete="off"
+              >
+              <label>password</label>
+            </div>
+            <div role="alert"></div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="auto">
+              <label class="form-check-label" for="exampleCheck1">auto</label>
+            </div>
+          </div>
+
+          <div id="errorContainer"></div>
+
+          <div class="d-gird">
+            <button type="submit" class="w-100 btn btn-primary">
+              <span>Login</span>
+              <span class="d-none">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span role="status">Loading...</span>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-</article>
+  </article>
+</main>

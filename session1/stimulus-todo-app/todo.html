@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo</title>
+  <script type="module">
+    import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+    window.Stimulus = Application.start()
+
+    Stimulus.register("todo", class extends Controller {
+      static targets = [ "title", "description", "name" ];
+      static values = { todos: Array };
+
+      initialize() {
+        console.log('initialized');
+      }
+
+      connect() {
+        console.log('connected');
+        this.titleTarget.innerText = 'AAA';
+      }
+
+      todosValueChanged() {
+        console.log(this.todosValue);
+      }
+
+      add() {
+        const description = this.descriptionTarget.value;
+        const name = this.nameTarget.value;
+
+        this.todosValue = [...this.todosValue, {
+          description, name,
+        }]; // = [...this.todosValue, 0];
+
+        this.descriptionTarget.value = '';
+        this.nameTarget.value = '';
+      }
+    })
+  </script>
+</head>
+<body>
+  <div data-controller="todo">
+    <h1 data-todo-target="title"></h1>
+    <form>
+      <button data-action="todo#add"> Add </button>
+      <input data-todo-target="name"></input>
+      <input data-todo-target="description"></input>
+    </form>
+  </div>
+</body>
+</html>
