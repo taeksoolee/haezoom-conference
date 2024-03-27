@@ -1,0 +1,23 @@
+<div>
+  <h2>Resource App</h2>
+  
+  <!-- pagination -->
+  <div>
+    <a href="./#!/resource-list?page=1">1</a>
+    <a href="./#!/resource-list?page=2">2</a>
+    <a href="./#!/resource-list?page=3">3</a>
+  </div>
+
+  <div>
+    <!-- <div>{{resources[0]}}</div> -->
+    <hr />
+    <div ng-repeat="resource in resources" class="resource">
+      <div class="type">[{{ resource.infra.type }}]</div>
+      <div class="name">
+        <a ng-href="./#!/resource-detail/{{resource.id}}">🔗</a>
+        {{ resource.infra.name }}
+      </div>
+      <div class="address">{{ resource.infra.address }}</div>
+    </div>
+  </div>
+</div>
