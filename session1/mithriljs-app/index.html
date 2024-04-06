@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mithril js</title>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
+  <script src="https://unpkg.com/mithril/mithril.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+
+    const Hello = {
+      view(vnode) {
+        return m(
+          'h1',
+          'hello world',
+        );
+      },
+    }
+
+    function Count() {
+      let count = 0;
+
+      const increase = () => {
+        count++
+      }
+      
+      return {
+        view(vnode) {
+          return m('div', [
+            m('button', {
+              onclick: increase,
+            }, 'Increment'),
+            m('div', `${count}`),
+          ]);
+        }
+      }
+    }
+
+    function List(initialVnode) {
+      let fruits = [
+        '🥕', '🥬', '🍎'
+      ];
+
+      return {
+        view(vnode) {
+          return m('div', {}, fruits);
+        }
+      }
+    }
+
+    function Loading () {
+      return {
+        view(vnode) {
+          return m('div', 'Loading...');
+        },  
+      }
+    }
+
+    const pocketmonRepository = {
+      list: [],
+      loading: false,
+      fetch() {
+        this.loading = true;
+        m.request({
+          url: 'https://pokeapi.co/api/v2/pokemon/',
+        })
+          .then(data => {
+            this.list = data.results;
+            this.loading = false;
+          }).catch(err => {
+            console.log(err);
+          });
+      },
+    };
+
+    function SearchForm() {
+      let value = '';
+
+      return {
+        view(vnode) {
+          return m('form', { onsubmit() { return false; } }, [
+            m('input', {
+              oninput(e) {
+                value = e.target.value;
+              }
+            }),
+            m('button', {
+              onclick() {
+                if (typeof vnode.attrs.onsubmit === 'function') {
+                  vnode.attrs.onsubmit(value);
+                }
+              }
+            }, 'Search'),
+          ]);
+        },
+      }
+    }
+
+    function Resources(initialVnode) {
+      const pocketmons = pocketmonRepository;
+
+      return {
+        oninit(vnode) {
+          pocketmons.fetch();
+        },
+        view(vnode) {
+          return m('div', m('div', [
+            m(SearchForm, {
+              onsubmit(value) {
+                console.log('submit', value);
+              }
+            }),
+            pocketmons.loading 
+            ? m(Loading)
+            : pocketmons.list.map(pocketmon => m('div', [
+                m('span', {class: 'name', onclick: function() {
+                  console.log(pocketmon.url);
+                }}, pocketmon.name),
+              ]))
+          ]));
+        }
+      }
+    }
+
+    
+
+    m.mount(document.querySelector('#root'), {
+      view() {
+        return m('div', [
+          m(Hello),
+          m(List),
+          m(Count),
+          m(Resources),
+        ]);
+      }
+    });
+  </script>
+</body>
+</html>
