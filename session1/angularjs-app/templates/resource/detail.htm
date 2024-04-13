@@ -1,0 +1,74 @@
+
+<notfound-wrapper notfound="notfound">
+	<back-button></back-button>
+	<loading-wrapper loading="loading">
+		<div class="resource-detail">
+			<h1>
+				<label>Resource ::: </label>
+				{{ state.resource.infra.type | emogi }}&nbsp;
+				{{ state.resource.infra.name }}
+			</h1>
+			<section>
+				<h2>📃 Infra</h2>
+				<div>address: {{ state.resource.infra.address }}</div>
+				<div>capacity: {{ state.resource.infra.capacity }}kW</div>
+				<div>
+					lat: {{ state.resource.infra.latitude | number:2 | falsy }} /
+					lng: {{ state.resource.infra.longitude | number:2 | falsy }} /
+					alt: {{ state.resource.infra.altitude | number:2 | falsy }}
+				</div>
+				<div>dl: {{ state.resource.dl | name:metadata.infra.dl | nullish }}</div>
+				<div>substation: {{ state.resource.substation | name:metadata.infra.substation | nullish }}</div>
+
+				<section>
+					<h3>🔩 Inverter</h3>
+					<div ng-repeat="inverter in state.resource.infra.inverter">
+						capacity: {{ inverter.capacity }} / 
+						titl: {{ inverter.tilt }} / 
+						azimuth: {{ inverter.azimuth }}
+					</div>
+				</section>
+			</section>
+
+			<section>
+				<h2>🔋 ESS</h2>
+				<div ng-if="!(state.resource.infra.ess && (state.resource.infra.ess > 0))">No Content</div>
+				<div ng-repeat="ess in state.resource.infra.ess">
+					<!-- TODO -->
+				</div>
+			</section>
+
+			<section>
+				<h2>🕹 Control</h2>
+				<div ng-if="!(state.resource.control && (state.resource.control.length > 0))">No Content</div>
+				<div ng-repeat="control in state.resource.control">
+					<h3>
+						{{ control.company | name:metadata.control.company | text }}
+						<label>{{ control.control_type | name:metadata.control.type | text }}</label>
+					</h3>
+				</div>
+			</section>
+
+			<sction>
+				<h2>🖥 Monitoring</h2>
+				<div ng-if="!(state.resource.monitoring && (state.resource.monitoring.length > 0))">No Content</div>
+				<div ng-repeat="monitoring in state.resource.monitoring">
+					<h3>{{ monitoring.company | name:metadata.monitoring.company | text }}</h3>
+				</div>
+			</sction>
+
+			<section>
+				<h2></h2>
+				<div></div>
+			</section>
+		</div>
+
+		<floating-title>
+			<h1>
+				<label>Resource ::: </label>
+				{{ state.resource.infra.type | emogi }}&nbsp;
+				{{ state.resource.infra.name }}
+			</h1>
+		</floating-title>
+	</loading-wrapper>
+</notfound-wrapper>

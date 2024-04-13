@@ -1,0 +1,20 @@
+<h1>Group</h1>
+<loading-wrapper loading="loading">
+  <ul>
+    <li ng-repeat="group in state.groups">
+      <a ng-href="./#!/group/detail/{{ group.id }}" style="display: inline-block; width: 160px;">
+        {{ group.grid | bracket }} {{ group.resourceCnt | mask:3 | bracket }} {{ group.name }}
+      </a>
+      <span style="margin-left: 20px; display: inline-block; width: 20px;">
+        <a ng-href="./#!/group/bidding/detail/{{ group.id }}">
+          🧮
+        </a>
+      </span>
+      <span style="margin-left: 20px; display: inline-block; width: 20px;">
+        <a ng-if="group.enableMonitoring" ng-href="./#!/group/monitoring/detail/{{ group.id }}">
+          🖥
+        </a>
+      </span>
+    </li>
+  </ul>
+</loading-wrapper>

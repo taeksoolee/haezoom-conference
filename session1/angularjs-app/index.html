@@ -7,55 +7,61 @@
   <title>Document</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.8.1/rxjs.umd.min.js" integrity="sha512-D9LDs8YUUVa4V9Gl4Zb+xqRAc7RCzooR3+zzebgK2RMu/KU+dh90pbjEEMzPiSyRSGbSp9j1pZnrO4joGa5WEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js" integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js" integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-route/1.8.3/angular-route.min.js" integrity="sha512-y1qD3hz/IAf8W4+/UMLZ+CN6LIoUGi7srWJ3r1R17Hid8x0yXe+1B5ZelkaL1Mjzedzu0Cg3HBvDG02SAgSzBw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="./index.module.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-cookies/1.8.3/angular-cookies.min.js" integrity="sha512-eM4WApD53FS2pv6fIgY4E2utWB82WSp3QPeoemIzA9VeOv9vQ1UzYBKIkXAwS71SCilEFpfkwtCZHj2uSS3keQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.8.3/angular-animate.min.js" integrity="sha512-Vhup4/4s+jnmiFsp1Sg1/6jXncRbIBc+fKemYjq1n+nEXthmeASyaWnClWsAV5Sas7WbLMLNYYHw6TxwQE4oPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"
+    integrity="sha512-g2TeAWw5GPnX7z0Kn8nFbYfeHcvAu/tx6d6mrLe/90mkCxO+RcptyYpksUz35EO337F83bZwcmUyHiHamspkfg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
 
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 </head>
 <body>
-  <div ng-app="App" ng-cloak>
-    <div ng-controller="MainCtrl">
-      <!-- AuthCtrl -->
-      <div ng-controller="AuthCtrl">
-        <div ng-show="!signed" style="width: 200px;">
-          <h3>Login</h3>
-          <form name="loginForm" ng-submit="login()" novalidate>
-            <div class="input-group">
-              <label for="loginForm__email">email</label>
-              <input name="email" id="loginForm__email" ng-model="loginFormData.email" required ng-class="{error: loginForm.email.$dirty && loginForm.email.$invalid}" />
-              <p ng-show="loginForm.email.$dirty && loginForm.email.$invalid" class="error" aria-describedby="loginForm__email">Required</p>
-            </div>
-            <div class="input-group">
-              <label for="loginForm__password">password</label>
-              <input name="password" id="loginForm__password" ng-model="loginFormData.password" required ng-class="{error: loginForm.password.$dirty && loginForm.password.$invalid}" type="password" />
-              <p ng-show="loginForm.password.$dirty && loginForm.password.$invalid" class="error" aria-describedby="loginForm__username">Required</p>
-            </div>
-
-            <div ng-show="loginFormAlert" role="alert" class="error">
-              {{ loginFormAlert }}
-            </div>
-
-            <button type="submit">Login</button>
-          </form>
-        </div>
-        <div ng-if="signed">
-          <header>
+  <div ng-app="app" ng-cloak>
+    <auth-wrapper signed="signed" inited="initedSignmanager" >
+      <div ng-controller="MainCtrl">
+        <header>
+          <div ng-if="user">
+            {{ user.name + ' / ' + user.email | bracket }}
+            <button ng-click="logout()">logout</button>
+          </div>
+          <div ng-show="now">
+            {{ now | date: 'yyyy-MM-dd HH:mm:ss' }}
+          </div>
+        </header>
+        
+        <main>
+          <aside>
+            <div style="color: #ff7133; font-weight: bold;">☀️ HAEZOOM</div>
             <nav>
               <ul>
                 <li><a href="./#!/">home</a></li>
+                <li><a href="./#!/group">group</a></li>
                 <li><a href="./#!/resource">resource</a></li>
+                <li><a href="./#!/bidding">bidding</a></li>
               </ul>
             </nav>
-            <button ng-click="logout()">logout</button>
-          </header>
+          </aside>
           <div ng-view></div>
-        </div>
+        </main>
       </div>
-
-
-    </div>
+    </auth-wrapper>
   </div>
+
+  <script type="module">
+    import './index.module.js';
+  </script>
 </body>
 </html>

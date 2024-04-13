@@ -1,0 +1,50 @@
+<div>
+  <h1>Resource</h1>
+  
+  <div>
+    <a href="./#!/resource/goruping">grouping</a>
+  </div>
+
+  <loading-wrapper loading="loading">
+    <!-- pagination -->
+    <div>
+      <span ng-repeat="i in data.pager" >
+        <a ng-if="i !== data.cur" ng-href="./#!/resource?page={{ i }}">
+          {{ i }}
+        </a>
+        <span ng-if="i === data.cur" class="no-select">
+          {{ i }}
+        </span>
+      </span>
+    </div>
+    <div>
+      <a ng-if="data.cur !== 1" ng-href="./#!/resource?page={{ data.cur-1 }}">&lt;</a>
+      <span ng-if="data.cur === 1" class="no-select">&lt;</span>
+      &nbsp;&nbsp;
+      <a ng-if="data.cur !== data.pager.length" ng-href="./#!/resource?page={{ data.cur+1 }}">&gt;</a>
+      <span ng-if="data.cur === data.pager.length" class="no-select">&gt;</span>
+    </div>
+
+    <!-- list -->
+    <div>
+      <div ng-repeat="item in data.list" class="resource">
+        <div class="type">{{ item.infra.type | emogi }}</div>
+        <div class="name">
+          <a ng-href="./#!/resource/detail/{{item.id}}">
+            📃&nbsp;{{ item.infra.name }}
+          </a>
+          <span style="margin-left: 20px;">
+            [
+            <span ng-if="item.infra.ess.length > 0">🔋</span>
+            <span ng-if="item.control">🕹</span>
+            <span ng-if="item.monitoring">🖥</span>
+            ]
+          </span>
+        </div>
+        <div class="address">
+          {{ item.infra.address }}
+        </div>
+      </div>
+    </div>
+  </loading-wrapper>
+</div>

@@ -2,38 +2,4 @@
   {{ title }}
 </h1>
 
-<!-- CountCtrl -->
-<div ng-controller="CountCtrl">
-  <h2>Count App</h2>
-  <div>{{ count | mask:5 }}</div>
-  <button ng-click="increase($event)">+</button>
-</div>
-<!-- end -->
-
-<!-- TodoCtrl -->
-<div ng-controller="TodoCtrl">
-  <h2>Todo App</h2>
-
-  <button ng-show="!shownForm" ng-click="openTodoForm()">+</button>
-  <form ng-show="shownForm" name="addTodoForm" ng-submit="addTodo()" novalidate>
-    <button type="button" ng-click="closeTodoForm()">x</button>
-    <input name="title" ng-model="newTodo.title" required placeholder="title" ng-class="{error: addTodoForm.title.$dirty && addTodoForm.title.$invalid}" />
-    <input name="description" ng-model="newTodo.description" placeholder="description" ng-class="{error: addTodoForm.title.$dirty && addTodoForm.description.$invalid}" />
-    <button type="submit">Add</button>
-  </form>
-
-  <div ng-repeat="todo in todos">
-    <details>
-      <summary>
-        <input type="checkbox" ng-checked="todo.checked" />
-        {{ todo.title }}
-        <button ng-click="delTodo(todo.id)">x</button>
-      </summary>
-      <p>
-        {{ todo.description | falsy }}
-        {{ todo.updatedAt | date:'yyyy.MM.dd' }}
-      </p>
-    </details>
-  </div>
-</div>
-<!-- end -->
+<!-- <counter></counter> -->

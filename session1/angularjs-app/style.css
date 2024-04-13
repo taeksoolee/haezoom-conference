@@ -1,4 +1,8 @@
-/* style.css */
+html,body {
+  padding: 0px;
+  margin: 0px;
+}
+
 input {
   border: 1px solid black;
 }
@@ -58,18 +62,141 @@ input.error:focus {
 
 .resource .type {
   display: inline-block;
-  width: 70px;
+  width: 30px;
   margin-bottom: 20px;
 }
 
 .resource .name {
   display: inline-block;
-  width: 200px;
+  width: 400px;
   margin-bottom: 20px;
 }
 
 .resource .address {
   display: inline-block;
-  width: 800px;
+  /* width: 800px; */
   margin-bottom: 20px;
+
+  width: 400px;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+
+}
+
+:where(h1, h2, h3, h4, h5, h6) label {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+section {
+  margin-left: 0px;
+}
+section section {
+  margin-left: 12px;
+}
+section section {
+  margin-left: 24px;
+}
+
+header {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 40px;
+
+  position: sticky;
+  top: 20px;
+
+  background-size: cover;
+}
+
+header>div {
+  z-index: 2;
+}
+
+header::before {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  content: ' ';
+  z-index: 1;
+}
+
+main {
+  display: flex;
+  min-height: calc(100vh - 40px);
+}
+
+aside {
+  padding: 20px;
+}
+
+aside ul {
+  list-style: none;
+  padding-left: 20px;
+}
+
+*[ng-view] {
+  flex: 1;
+}
+
+.indent {
+  --indent: 20px;
+}
+
+.indent-1 {
+  margin-left: calc(var(--indent) * 1);
+}
+.indent-2 {
+  margin-left: calc(var(--indent) * 2);
+}
+.indent-3 {
+  margin-left: calc(var(--indent) * 3);
+}
+.indent-4 {
+  margin-left: calc(var(--indent) * 4);
+}
+.indent-5 {
+  margin-left: calc(var(--indent) * 5);
+}
+
+.monitoring-item {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.monitoring-time {
+  color: gray;
+}
+
+.monitoring-time.now {
+  font-weight: bold;
+}
+
+.monitoring-time.now::after {
+  content: 'now';
+  color: var(--selection);
+}
+
+back-button {
+  display: block;
+  margin-top: 20px;
+}
+
+.no-select {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.show-hide {
+  transition: all ease-in-out 0.5s;
+}
+.show-hide.ng-hide {
+  opacity: 0;
 }

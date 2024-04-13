@@ -1,0 +1,47 @@
+
+<notfound-wrapper notfound="notfound">
+	<back-button></back-button>
+	<loading-wrapper loading="loading">
+		<h1>
+			<label>Resource ::: </label>
+			{{ state.resource.infra.type | emogi }}&nbsp;
+			{{ state.resource.infra.name }}
+		</h1>
+		<h2>🖥&nbsp;&nbsp;&nbsp;Monitoring Data</h2>
+    <div style="margin-bottom: 20px;">
+      <div>
+        opened : {{ openedMonitoringList | orderBy }}
+        <button ng-click="closeAll()">Close All</button>
+      </div>
+      <div>
+        <label>
+          <input type="checkbox" ng-model="withHourAgo" />
+          Show Content with 1 hour ago
+        </label>
+      </div>
+    </div>
+    <h3 ng-if="monitoring | isEmpty">not found monitoring data</h3>
+    <div ng-repeat="(time, data) in (withHourAgo ? monitoring : (monitoring | sliceCurHour))" class="monitoring-item">
+      <div class="indent indent-1 monitoring-time" ng-class="{now: time === (now | date:'HH:mm')}">
+        <button ng-click="toggle(time)">...</button>
+        {{ time }}
+        <span ng-if="data.missing_data === 'True'">
+          ❗️
+        </span>
+      </div>
+      
+      <div ng-if="openedMonitoringList.includes(time)" class="indent indent-2">
+        <div ng-repeat="(name, value) in data">
+          {{ name }} : {{ value | json }}
+        </div>
+      </div>
+    </div>
+    <floating-title>
+      <h1>
+        <label>Resource ::: </label>
+        {{ state.resource.infra.type | emogi }}&nbsp;
+        {{ state.resource.infra.name }}
+      </h1>
+    </floating-title>
+	</loading-wrapper>
+</notfound-wrapper>

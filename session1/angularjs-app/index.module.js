@@ -1,434 +1,452 @@
-// index.module.js
-const app = angular.module('App', ['ngRoute'])
-  .constant('config', {
-    API_ORIGIN: 'https://apidev.vpphaezoom.com',
-    ACCESS_KEY: '__access',
-    REFRESH_KEY: '__refresh',
-  })
-  .config(function($routeProvider) {
-    console.count('init ::: config');
-    $routeProvider
-      .when('/', { 
-        templateUrl: './templates/home.htm',
-      })
-      .when('/resource', { 
-        templateUrl: './templates/resource-list.htm', 
-        controller: 'ResourceListCtrl'
-      })
-      .when('/resource/detail/:id', { 
-        templateUrl: './templates/resource-detail.htm', 
-        controller: 'ResourceDetailCtrl'
-      })
-      .when('/resource/goruping', {
-        templateUrl: './templates/grouping.htm',
-        controller: 'GroupingCtrl',
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  })
-  .run(function($rootScope, $http, $s, $signmanager, config, $q) {
-    console.count('init ::: run');
+import './modules/config.module.js';
+import './modules/filter.module.js';
+import './modules/utility.module.js';
+import './modules/repository.module.js';
+import './modules/layout.module.js';
+import './modules/component.module.js';
+import './modules/socket.module.js';
+import './modules/style.module.js';
 
-    $rootScope.metadata = null;
-
-    $rootScope.signed = false;
-    if ($signmanager.isSigned) {
-      $http.defaults.headers.common.Authorization = `Bearer ${$signmanager.access}`;
-      $rootScope.signed = true;
-    }
-
-    $s.subscribe({
-      next ({ action, payload }) {
-        if (action === 'sign') {
-          $signmanager.sign(payload);
-          $http.defaults.headers.common.Authorization = `Bearer ${$signmanager.access}`;
-          $rootScope.signed = true;
-
-          $http.get(`${config.API_ORIGIN}/api/list/monitoring/`).then(
-            function success(res) {
-              console.log(res.data);
-            },
-            function failed(err) {
-              console.log(err);
-            }
-          )
-
-        } else if (action === 'unsign') {
-          $signmanager.unsign();
-          $http.defaults.headers.common.Authorization = undefined;
-          $rootScope.signed = false;
-          $rootScope.metadata = null;
-        }
-      },
-    });
-  })
-  .filter('mask', function() {
-    return (input, len=4) => isNaN(Number(input)) ? '-' : String(input).slice(0, len).padStart(len, '0');
-  })
-  .filter('falsy', function() {
-    return (input, replace='-') => {
-      return input || null === null ? replace : input;
-    }
-  })
-  .filter('nullish', function() {
-    return (input, replace='-') => {
-      return input ?? null === null ? replace : input;
-    }
-  })
-  .provider('$s', function() {
-    console.count('init ::: provider ::: $s');
-    this.$get = function() {
-      return new rxjs.Subject();
-    };
-  })
-  .factory('$id', function() {
-    return function() {
-      return _.uniqueId(`id_${Date.now()}`);
-    }
-  })
-  .service('$u', function() {
-    console.count('init ::: $u');
-    this.computed = function(name, ref, fn, $scope) {
-      $scope[name] = angular.copy($scope[ref]);
-
-      $scope.$watch(ref, function(newVal, _oldVal) {
-        $scope[name] = fn ? fn(newVal) : newVal;
-      });
-    }
-  })
-  .service('$form', function() {
-    console.count('init ::: $form');
-    this.focus = function(ref='') {
-      const refs = ref.split('.');
-      const target = refs.reduce((a, c) => a?.[c] ?? null, window);
-      if (target) {
-        setTimeout(() => {
-          target.focus();
+(function (angular) {
+  angular.module('app', [
+    'ngRoute',
+    'appConfig',
+    'appFilter', 
+    'appUtility', 
+    'appRepository',
+    'appSocket',
+    'appLayout',
+    'appStyle',
+    'appComponent',
+  ])
+    .config(function($routeProvider) {
+      $routeProvider
+        .when('/', { 
+          templateUrl: './templates/home.htm',
+        })
+        .when('/group', { 
+          templateUrl: './templates/group/index.htm', 
+          controller: 'GroupCtrl'
+        })
+        .when('/group/detail/:id', { 
+          templateUrl: './templates/group/detail.htm', 
+          controller: 'GroupDetailCtrl'
+        })
+        .when('/group/bidding/detail/:id', { 
+          templateUrl: './templates/group/bidding/detail.htm', 
+          controller: 'GroupBiddingDetailCtrl'
+        })
+        .when('/group/bidding/detail/:id/dayahead', { 
+          templateUrl: './templates/group/bidding/dayahead/index.htm', 
+          controller: 'GroupBiddingDetailDayaheadCtrl'
+        })
+        .when('/group/bidding/detail/:id/realtime', { 
+          templateUrl: './templates/group/bidding/realtime/index.htm', 
+          controller: 'GroupBiddingDetailRealtimeCtrl'
+        })
+        .when('/group/monitoring/detail/:id', { 
+          templateUrl: './templates/group/monitoring/detail.htm', 
+          controller: 'GroupMonitoringDetailCtrl'
+        })
+        .when('/resource', { 
+          templateUrl: './templates/resource/index.htm', 
+          controller: 'ResourceCtrl'
+        })
+        .when('/resource/detail/:id', { 
+          templateUrl: './templates/resource/detail.htm', 
+          controller: 'ResourceDetailCtrl'
+        })
+        .when('/resource/monitoring/detail/:id', { 
+          templateUrl: './templates/resource/monitoring/detail.htm', 
+          controller: 'ResourceMonitoringDetailCtrl'
+        })
+        .when('/resource/goruping', {
+          templateUrl: './templates/resource/grouping.htm',
+          controller: 'ResourceGroupingCtrl',
+        })
+        .when('/bidding', { 
+          templateUrl: './templates/bidding/index.htm', 
+          controller: 'BiddingCtrl',
+        })
+        .when('/bidding/dayahead', { 
+          templateUrl: './templates/bidding/dayahead.htm', 
+          controller: 'BiddingDayaheadCtrl',
+        })
+        .when('/bidding/realtime', { 
+          templateUrl: './templates/bidding/realtime.htm', 
+          controller: 'BiddingRealtimeCtrl',
+        })
+        .otherwise({
+          redirectTo: '/'
         });
-      }
-    }
-
-    this.validate = function($scope, ref='') {
-      const refs = ref.split('.');
-      const form = $scope[refs[0]] ?? null;
-      const target = refs.reduce((a, c) => a?.[c] ?? null, $scope);
-
-      if (!(form && target)) return;
-
-      form.$pristine
-        && angular.forEach(form.$error, function (controls) {
-          angular.forEach(controls, function (control) {
-            control.$setDirty();
-          });
-        });
-    }
-
-    this.reset = function($scope, ref='') {
-      const refs = ref.split('.');
-      const form = $scope[refs[0]] ?? null;
-
-      form.$setPristine();
-      form.$setUntouched();
-    }
-  })
-  .provider('$signmanager', function(config) {
-    console.count('init ::: provider ::: $signmanager');
-
-    this.$get = function() {
-      return new (class SignManager {
-        get access() {
-          return localStorage.getItem(config.ACCESS_KEY) ?? null;
-        }        
-
-        setAccess(token) {
-          localStorage.setItem(config.ACCESS_KEY, token);
-        }
-
-        removeAccess() {
-          localStorage.removeItem(config.ACCESS_KEY);
-        }
-
-        get refresh() {
-          return localStorage.getItem(config.REFRESH_KEY) ?? null;
-        }
-
-        setRefresh(token) {
-          return localStorage.setItem(config.REFRESH_KEY, token);
-        }
-
-        removeRefresh() {
-          localStorage.removeItem(config.REFRESH_KEY);
-        }
-        
-        get tokens() {
-          return {
-            access: this.access,
-            refresh: this.refresh,
-          }
-        }
-
-        sign({access, refresh}) {
-          this.setAccess(access);
-          this.setRefresh(refresh);
-        }
-
-        unsign() {
-          this.removeAccess();
-          this.removeRefresh();
-        }
-
-        get isSigned() {
-          return !!this.access;
-        }
-
-        get info() {
-          if (this.access === null) return null;
-          return KJUR.jws.JWS.parse(this.access)?.payloadObj;
-        }
-
-        get refreshInfo() {
-          if (this.refresh === null) return null;
-          return KJUR.jws.JWS.parse(this.refresh)?.payloadObj;
-        }
-      })();
-    }
-  })
-  .controller('MainCtrl', function($scope) {
-    $scope.title = 'Hello World';
-  })
-  .controller('CountCtrl', function($scope, $s) {
-    console.count('CountCtrl');
-    $scope.count = 0;
-
-    $scope.increase = function(_e) {
-      $scope.count++;
-
-      $s.next({
-        ctrl: 'CountCtrl',
-        data: {
-          cur: $scope.count,
-        }
-      });
-    }
-  })
-  .service('todo', function ($id) {
-    const S_TODOS = Symbol('todos');
-    this[S_TODOS] = [];
-
-    this.findAll = function() {
-      return this[S_TODOS];
-    }
-
-    this.getDefaultTodoFormData = function() {
-      return {
-        title: '',
-        description: '',
-      }
-    }
-
-    this.delete = function(id) {
-      const idx = this[S_TODOS].findIndex((e) => e.id === id);
-      this[S_TODOS].splice(idx, 1);
-    }
-
-    this.create = function(newTodo) {
-      this[S_TODOS].push({
-        ...newTodo,
-        id: $id(),
-        checked: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      })
-    }
-  })
-  .controller('TodoCtrl', function($scope, todo, $u, $s, $form) {
-    $scope.newTodo = null;
-    $scope.todos = todo.findAll();
-
-    $scope.openTodoForm = function() {
-      $scope.newTodo = todo.getDefaultTodoFormData();
-      
-      $form.focus('addTodoForm.title');
-    }
-
-    $scope.closeTodoForm = function() {
-      $scope.newTodo = null;
-
-      $form.reset($scope, 'addTodoForm');
-    }
-
-    $scope.addTodo = function() {
-      $form.validate($scope, 'addTodoForm');
-      if ($scope.addTodoForm.$invalid) return;
-
-      todo.create($scope.newTodo);
-      $scope.closeTodoForm();
-    }
-
-    $scope.delTodo = function(id) {
-      todo.delete(id);
-    }
-
-    $u.computed('shownForm', 'newTodo', (newVal) => !!newVal, $scope);
-
-    $s.subscribe((data) => {
-      console.log(data);
     })
-  })
-  .controller('AuthCtrl', function($scope, $form, $http, config, $s) {
-    $scope.loginFormAlert = '';
-    $scope.loginFormData = {
-      email: '',
-      password: '',
-    };
-
-    $scope.login = function() {
-      $scope.loginFormAlert = '';
-
-      $form.validate($scope, 'loginForm');
-      if ($scope.loginForm.$invalid) return;
-
-      console.log('login start');
-
-      $http({
-        url: `${config.API_ORIGIN}/api/user/token/`,
-        method: 'POST',
-        data: Object.fromEntries([...new FormData(window.loginForm).entries()]),
-      })
-        .then(
-          function success(res) {
-            const {
-              access, refresh,
-            } = res.data;
-
-            $scope.loginFormAlert = '';
-            $scope.loginFormData = {
-              email: '',
-              password: '',
-            };
-            $form.reset($scope, 'loginForm');
-
-            $s.next({
-              action: 'sign',
-              payload: { access, refresh },
-            });
-          },
-          function failed(err) {
-            $scope.loginFormAlert = err.data.message;
-          }
-        )
-    }
-
-    $scope.logout = function() {
-      $s.next({
-        action: 'unsign',
-      });
-    }
-  })
-  .service('resource', function($http, config, $q) {
-    this.findAll = function() {
-      return $q(function(resolve, reject) {
-        $http({
-          method: 'GET',
-          url: `${config.API_ORIGIN}/api/resource/`,
-          cache: true,
-        })
-          .then(
-            function success(res) {
-              resolve(res.data.results);
-            },
-            function failed(res) {
-              reject(res.data);
-            }
-          );
-      });
-    }
-
-    this.findById = function(id) {
-      return $q(function(resolve, reject) {
-        $http({
-          method: 'GET',
-          url: `${config.API_ORIGIN}/api/resource/${id}`
-        })
-          .then(
-            function success(res) {
-              resolve(res.data);
-            },
-            function failed(res) {
-              reject(res.data);
-            }
-          );
-      })
-    }
-  })
-  .controller('ResourceCtrl', function($scope, resource) {
-  })
-  .controller('ResourceListCtrl', function($scope, resource, $signmanager, $routeParams) {
-    console.count('init ::: ResourceListCtrl');
-    const page = Number(Number($routeParams.page) || '1');
-    const pageSize = 5;
-    $scope.resources = [];
-
-    $scope.data = {
-      list: [],
-      pager: [],
-      cur: page,
-    }
-
-    $scope.loading = false;
-
-    $scope.$watch('resources', function(newVal) {
-      $scope.data.list = newVal.slice(page, page+pageSize);
-      $scope.data.pager = Array.from({length: Math.ceil(newVal.length / pageSize)}).map((_, i) => i+1);
-    });
-
-    if ($signmanager.access) {
+    .controller('MainCtrl', function($rootScope, $scope, auth, utility) {
+      $scope.title = 'Hello World';
+  
+      $scope.logout = function() {
+        auth.unsign();
+      }
+  
+      utility.interval($scope, function() {
+        $rootScope.now = Date.now();
+      }, 500);
+    })
+    .controller('GroupCtrl', function($scope, $q, $log, group, meter) {
       $scope.loading = true;
-      resource.findAll()
-          .then(
-            function(data) {
-              $scope.resources = data;
-              $scope.loading = false;
-              // if (Array.isArray(data)) {
-              //   data.forEach(resource => {
-              //     $scope.resources.push(resource);
-              //   })
-              // }
-            }
-          );
-    } else {
-
-    }
-  })
-  .controller('ResourceDetailCtrl', function($scope, resource, $signmanager, $routeParams) {
-    console.count('init ::: ResourceDetailCtrl');
-    const id = $routeParams.id;
-    $scope.resource = null;
-    if ($signmanager.access) {
-      resource.findById(id)
+      $scope.state = {
+        groups: null,
+      }
+  
+      group.findAll()
         .then(
-          function success(data) {
-            $scope.resource = data;
-          },
-          function failed(err) {
-            console.log(err);
+          function(groups) {
+
+            $q.all(groups.map(e => group.findResourcesById(e.id)))
+              .then(
+                function success(resourcesList) {
+                  resourcesList.forEach((resources, i) => {
+                    groups[i].resourceCnt = resources.length;
+                  });
+
+                  $scope.loading = false;
+                  $scope.state = {
+                    groups,
+                  }
+
+                },
+                function failed(err) {
+                  throw Error('Request Failed');
+                }
+              )
+
+            
           }
         );
-    } else {
 
-    }
-  })
-  .controller('GroupingCtrl', function($q, $http, config) {
-    $q.all([
-      $http.get(`${config.API_ORIGIN}/api/list/monitoring/`),
-      $http.get(`${config.API_ORIGIN}/api/list/control/`),
-    ]).then(
-        function success(res) {
-          console.log(res.data);
-        },
-      )
-      .catch(function(err) {
-        console.log(err);
+      meter.connect(function(data) {
+        if ($scope.state.groups) {
+          $scope.state = {
+            groups: $scope.state.groups.map(e => ({
+              ...e,
+              enableMonitoring: !!data.monitoring.group[e.id],
+            }))
+          }
+          
+        }
       });
-  })
+
+      $scope.$on('$destroy', function() {
+        meter.disconnect();
+      });
+    })
+    .controller('GroupDetailCtrl', function($scope, $routeParams, $q, group, meter) {
+      const { id } = $routeParams;
+
+      $scope.loading = true;
+      $scope.notfound = false;
+      $scope.state = {
+        groupInfo: null,
+        resources: [],
+      }
+
+      $scope.isMW = false;
+      
+      $q.all([
+        group.findById(id),
+        group.findResourcesById(id),
+      ]).then(
+        function success([groupInfo, resources]) {
+          $scope.loading = false;
+
+          const groupCapacity = resources.reduce((a, c) => a+Number(c.infra.capacity), 0);
+  
+          $scope.state = {
+            groupInfo,
+            resources: resources.map(e => ({
+              ...e,
+              rate: Math.round(Number(e.infra.capacity) / groupCapacity * 100 * 1000) / 1000 // 가중치
+            })),
+            groupCapacity,
+          };
+        },
+        function failed() {
+          $scope.notfound = true;
+        }
+      );
+
+      meter.connect(function(data) {
+        if ($scope.state.resources) {
+          $scope.state = {
+            ...$scope.state,
+            resources: $scope.state.resources.map(e => ({
+              ...e,
+              enableMonitoring: !!data.monitoring.resource[e.id],
+            }))
+          }
+        }
+      });
+
+      $scope.$on('$destroy', function() {
+        meter.disconnect();
+      });
+    })
+    .controller('GroupBiddingDetailCtrl', function($scope, $routeParams, $q, group, dayahead, realtime, meter, utility) {
+      const { id } = $routeParams;
+      $scope.id = id;
+  
+      $scope.loading = true;
+      $scope.notfound = false;
+      $scope.state = {
+        groupInfo: null,
+        realtime: {
+          biddingSubmit: null,
+        }
+      }
+      
+      $q.all([
+        group.findById(id),
+        realtime.biddingSubmitState(
+          id,
+          dayjs().format('YYYY-MM-DD'),
+          dayjs().format('H'),
+        ),
+        dayahead.biddingSubmitState(
+          id,
+          dayjs().format('YYYY-MM-DD'),
+          dayjs().format('H'),
+        ),
+      ]).then(
+        function success([groupInfo, rtBiddingSubmit, daBiddingSubmit]) {
+          $scope.loading = false;
+  
+          $scope.state = {
+            groupInfo,
+            realtime: {
+              biddingSubmit: rtBiddingSubmit,
+            },
+            dayahead: {
+              biddingSubmit: daBiddingSubmit,
+            },
+          };
+        },
+        function failed() {
+          $scope.notfound = true;
+        }
+      );
+  
+      utility.interval($scope, function() {
+        realtime.biddingSubmitState(
+          id,
+          dayjs().format('YYYY-MM-DD'),
+          dayjs().format('H'),
+        ).then(function success(biddingState) {
+          $scope.state = {
+            ...$scope.state,
+            realtime: {
+              ...$scope.state.realtime,
+              biddingState,
+            },
+            dayahead: {
+              ...$scope.state.dayahead,
+            },
+          };
+        })
+      }, 1000 * 60);
+    })
+    .controller('GroupBiddingDetailDayaheadCtrl', function($scope, $routeParams, $q, group, dayahead, realtime, meter, utility) {
+    })
+    .controller('GroupBiddingDetailRealtimeCtrl', function($scope, $routeParams, $q, group, dayahead, realtime, meter, utility) {
+    })
+    .controller('GroupMonitoringDetailCtrl', function($scope, $routeParams, group, meter, $log) {
+      const { id } = $routeParams;
+
+      $scope.loading = true;
+      $scope.notfound = false;
+      $scope.state = {
+        groupInfo: null,
+      }
+
+
+      group.findById(id)
+        .then(
+          function success(groupInfo) {
+            $scope.state = {
+              groupInfo,
+            }
+            $scope.loading = false;
+          },
+          function failed() {
+            $scope.notfound = true;
+          }
+        )
+
+      $scope.monitoring = null;
+
+      $scope.openedMonitoringList = [];
+      $scope.toggle = function(time) {
+        const idx = $scope.openedMonitoringList.indexOf(time);
+        if (idx === -1) {
+          $scope.openedMonitoringList.push(time);
+        } else {
+          $scope.openedMonitoringList.splice(idx, 1);
+        }
+      }
+      $scope.closeAll = function() {
+        $scope.openedMonitoringList = [];
+      }
+
+      $scope.withHourAgo = false;
+
+      meter.connect(function(data) {
+        $scope.monitoring = data.monitoring.group[id]?.reduce((a, c) => {
+          const time = c.time;
+          delete c.time;
+          a[time] = {
+            ...c,
+          }
+          return a;
+        }, {}) ?? {};
+      });
+
+      $scope.$on('$destroy', function() {
+        meter.disconnect();
+      });
+    })
+    .controller('ResourceCtrl', function($scope, $routeParams, $log, resource) {
+      console.count('init ::: ResourceListCtrl');
+      const page = Number(Number($routeParams.page) || '1');
+      const pageSize = 5;
+      $scope.resources = [];
+  
+      $scope.data = {
+        list: [],
+        pager: [],
+        cur: page,
+      }
+  
+      $scope.loading = false;
+  
+      $scope.$watch('resources', function(newVal) {
+        const start = (page-1)*pageSize;
+        $scope.data.list = newVal.slice(start, start+pageSize);
+        $scope.data.pager = Array.from({length: Math.ceil(newVal.length / pageSize)}).map((_, i) => i+1);
+      });
+  
+      $scope.loading = true;
+
+      resource.findAll()
+        .then(
+          function(data) {
+            $scope.resources = data;
+            $scope.loading = false;
+          }
+        );
+    })
+    .controller('ResourceDetailCtrl', function($scope, resource, $routeParams) {
+      console.count('init ::: ResourceDetailCtrl');
+      const { id } = $routeParams;
+  
+      $scope.loading = true;
+      $scope.fontfound = false;
+      $scope.state = { 
+        resource: null
+      };
+  
+      resource.findById(id)
+        .then(function success(resource) {
+          $scope.loading = false;
+          $scope.state = {
+            resource,
+          };
+        }, function failed() {
+          $scope.notfound = true;
+        });
+      
+    })
+    .controller('ResourceMonitoringDetailCtrl', function($scope, $routeParams, resource, meter) {
+      const { id } = $routeParams;
+  
+      $scope.loading = true;
+      $scope.fontfound = false;
+      $scope.state = { 
+        resource: null
+      };
+  
+      resource.findById(id)
+        .then(function success(resource) {
+          $scope.loading = false;
+          $scope.state = {
+            resource,
+          };
+        }, function failed() {
+          $scope.notfound = true;
+        });
+  
+      $scope.monitoring = null;
+
+      $scope.openedMonitoringList = [];
+      $scope.toggle = function(time) {
+        const idx = $scope.openedMonitoringList.indexOf(time);
+        if (idx === -1) {
+          $scope.openedMonitoringList.push(time);
+        } else {
+          $scope.openedMonitoringList.splice(idx, 1);
+        }
+      }
+      $scope.closeAll = function() {
+        $scope.openedMonitoringList = [];
+      }
+
+      $scope.withHourAgo = false;
+
+      meter.connect(function(data) {
+        $scope.monitoring = data.monitoring.resource[id]?.reduce((a, c) => {
+          const time = c.time;
+          delete c.time;
+          a[time] = {
+            ...c,
+          }
+          return a;
+        }, {}) ?? {};
+      });
+
+      $scope.$on('$destroy', function() {
+        meter.disconnect();
+      });
+    })
+    .controller('ResourceGroupingCtrl', function($scope) {
+      // console.log($scope);
+    })
+    .controller('BiddingCtrl', function($scope) {
+      console.log($scope);
+    })
+    .controller('BiddingDayaheadCtrl', function($scope, group, dayahead, utility, $log) {
+      console.log($scope);
+  
+      group.findAll()
+        .then(
+          function(groups) {
+            $log.debug(groups);
+            dayahead.bidding(
+              groups[0].id,
+              '2024-03-29',
+              true,
+            )
+              .then(
+                function(res) {
+                  $log.debug(res);
+                }
+              )
+          }
+        );
+  
+      utility.interval($scope, () => {
+        console.log('BiddingDayaheadCtrl');
+      }, 3000);
+    })
+    .controller('BiddingRealtimeCtrl', function($scope, utility) {
+      utility.interval($scope, () => {
+        console.log('BiddingRealtimeCtrl');
+      }, 3000);
+    });  
+})(window.angular);

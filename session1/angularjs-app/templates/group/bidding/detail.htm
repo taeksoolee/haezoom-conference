@@ -1,0 +1,35 @@
+<notfound-wrapper notfound="notfound">
+  <back-button></back-button>
+  <loading-wrapper loading="loading">
+    <h1>
+      <label>Group ::: </label>
+      {{ state.groupInfo.name }}
+      <label>{{ state.groupInfo.grid | bracket}}</label>
+    </h1>
+    <section>
+      <hr style="margin-top: 30px;"/>
+      <div>
+        <h2>0️⃣ Dayahead</h2>
+        <p>State : {{ state.dayahead.biddingSubmit.state | text }}</p>
+        <span ng-if="!!state.dayahead.biddingSubmit.submit_at">
+          Submit At : {{ state.dayahead.biddingSubmit.submit_at | date:'yyyy-MM-dd HH:mm' }}
+        </span>
+
+        <a ng-href="./#!/group/bidding/detail/{{ id }}/dayahead">➡️</a>
+      </div>
+      <hr style="margin-top: 30px;"/>
+      <div>
+        <h2>1️⃣ Realtime</h2>
+        <div><span style="display: inline-block; width: 160px;">RT Section : </span>{{ now | hourlySection }}</div>
+        <div><span style="display: inline-block; width: 160px;">RT Bidding Section: </span>{{ now | bidHourlySection }}</div>
+        <p>State : {{ state.realtime.biddingSubmit.state | text }}</p>
+        <span ng-if="!!state.realtime.biddingSubmit.submit_at">
+          Submit At : {{ state.realtime.biddingSubmit.submit_at | date:'yyyy-MM-dd HH:mm' }}
+        </span>
+
+        <a ng-href="./#!/group/bidding/detail/{{ id }}/realtime">➡️</a>
+      </div>
+      <hr style="margin-top: 30px;"/>
+    </section>
+  </loading-wrapper>
+</notfound-wrapper>

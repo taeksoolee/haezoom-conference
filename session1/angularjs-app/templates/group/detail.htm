@@ -1,0 +1,43 @@
+<notfound-wrapper notfound="notfound">
+  <back-button></back-button>
+  <loading-wrapper loading="loading">
+    <h1>
+      <label>Group ::: </label>
+      {{ state.groupInfo.name }}
+      <label>{{ state.groupInfo.grid | bracket }}</label>
+    </h1>
+
+    <p ng-click="isMW = !isMW">
+      Capacity : {{ (isMW ? state.groupCapacity / 1000 : state.groupCapacity) | number:3 }}
+      <span>{{ isMW ? 'MW' : 'kW' }}</span>
+    </p>
+
+    <h2>📄 Resource List</h2>
+
+    <h4 ng-if="state.resources | isEmpty">No Conetnt</h4>
+    <ul>
+      <li ng-repeat="resource in state.resources">
+        <a ng-href="./#!/resource/detail/{{ resource.id }}" style="display: inline-block; width: 200px;">
+          <span>{{ resource.infra.name }}</span>
+          
+        </a>
+        <span style="display: inline-block; width: 80px; text-align: right;">
+          <span>{{ resource.rate | number:3 }} %</span>
+        </span>
+
+        <span style="margin-left: 20px; display: inline-block; width: 20px;">
+          <a ng-if="resource.enableMonitoring" ng-href="./#!/resource/monitoring/detail/{{ resource.id }}">
+            🖥
+          </a>
+        </span>
+      </li>
+    </ul>
+    <floating-title>
+      <h1>
+        <label>Group ::: </label>
+        {{ state.groupInfo.name }}
+        <label>{{ state.groupInfo.grid | bracket }}</label>
+      </h1>
+    </floating-title>
+  </loading-wrapper>
+</notfound-wrapper>
