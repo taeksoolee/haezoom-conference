@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stimulus JS</title>
+  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+</head>
+<body>
+  
+  <div data-controller="search resources" data-action="search:search->resources#search">
+    <form data-action="search#search" onsubmit="return false;">
+      <input name="filter" data-search-target="filter" ></input>
+      <button>Search</button>
+    </div>
+
+    <div></div>
+  </div>
+
+  <div data-controller="counter">
+    <div data-counter-target="value"></div>
+  </div>
+
+  <script>
+    const app = Stimulus.Application.start();
+
+    app.register('search', class extends Stimulus.Controller {
+      static targets = [ 'filter' ];
+      get filterValue() {
+        return this.filterTarget.value;
+      }
+
+      // 특정상황에서만 load 설정
+      // static get shouldLoad() {
+      //   return false; // 
+      // }
+
+      // static afterLoad(identifier, application) {
+
+      // }
+
+      connect() {
+        console.log('mounted', this, this.element);
+      }
+
+      search() {
+        console.log('Search', this.filterValue);
+        const payload = {
+          filter: this.filterValue,
+        };
+        this.dispatch('search', {
+          detail: payload,
+        });
+      }
+    });
+
+    app.register('resources', class extends Stimulus.Controller {
+      connect() {
+        this._fetch();
+      }
+
+      _fetch() {
+        console.log('fetch');
+      }
+
+      search(identifier, application) {
+        const payload = identifier.detail;
+        console.log(payload);
+      }
+    });
+
+    app.register('counter', class extends Stimulus.Controller {
+      static targets = [ 'value' ];
+      
+      'data-counter'
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stimulusjs Count To</title>
+  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+</head>
+<body>
+  <div data-controller="count-to"
+      data-count-to-to-value="5000"
+      data-count-to-max="9999"
+      data-count-to-precision="2"
+      data-count-to-use-locale-format="true"
+      data-count-to-duration="500"
+      data-count-to-interval="30">
+    <span data-count-to-target="display"></span>
+</div>
+  <script src="./count-to.js"></script>
+</body>
+</html>
