@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    var hyperapp=(function(){var e={},n=[],r=e=>e,t=n.map,l=Array.isArray,o="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout,i=e=>{var n="";if("string"==typeof e)return e;if(l(e))for(var r,t=0;t<e.length;t++)(r=i(e[t]))&&(n+=(n&&" ")+r);else for(var t in e)e[t]&&(n+=(n&&" ")+t);return n},a=(e,n)=>{for(var r in{...e,...n})if("function"==typeof(l(e[r])?e[r][0]:e[r]))n[r]=e[r];else if(e[r]!==n[r])return!0},f=(e,r=n,t)=>{for(var l,o,i=[],f=0;f<e.length||f<r.length;f++)l=e[f],i.push((o=r[f])&&!0!==o?!l||o[0]!==l[0]||a(o[1],l[1])?[o[0],o[1],(l&&l[2](),o[0](t,o[1])),]:l:l&&l[2]());return i},u=e=>null==e?e:e.key,s=(e,n,r,t,l,o)=>{if("style"===n)for(var i in{...r,...t})r=null==t||null==t[i]?"":t[i],"-"===i[0]?e[n].setProperty(i,r):e[n][i]=r;else"o"===n[0]&&"n"===n[1]?((e.events||(e.events={}))[n=n.slice(2)]=t)?r||e.addEventListener(n,l):e.removeEventListener(n,l):!o&&"list"!==n&&"form"!==n&&n in e?e[n]=null==t?"":t:null==t||!1===t?e.removeAttribute(n):e.setAttribute(n,t)},d=(e,n,r)=>{var t=e.props,l=3===e.type?document.createTextNode(e.tag):(r=r||"svg"===e.tag)?document.createElementNS("http://www.w3.org/2000/svg",e.tag,t.is&&t):document.createElement(e.tag,t.is&&t);for(var o in t)s(l,o,null,t[o],n,r);for(var i=0;i<e.children.length;i++)l.appendChild(d(e.children[i]=$(e.children[i]),n,r));return e.node=l},v=(e,n,r,t,l,o)=>{if(r===t);else if(null!=r&&3===r.type&&3===t.type)r.tag!==t.tag&&(n.nodeValue=t.tag);else if(null==r||r.tag!==t.tag)n=e.insertBefore(d(t=$(t),l,o),n),null!=r&&e.removeChild(r.node);else{var i,a,f,p,c=r.props,m=t.props,g=r.children,h=t.children,y=0,_=0,C=g.length-1,w=h.length-1;for(var k in o=o||"svg"===t.tag,{...c,...m})("value"===k||"selected"===k||"checked"===k?n[k]:c[k])!==m[k]&&s(n,k,c[k],m[k],l,o);for(;_<=w&&y<=C&&null!=(f=u(g[y]))&&f===u(h[_]);)v(n,g[y].node,g[y],h[_]=$(h[_++],g[y++]),l,o);for(;_<=w&&y<=C&&null!=(f=u(g[C]))&&f===u(h[w]);)v(n,g[C].node,g[C],h[w]=$(h[w--],g[C--]),l,o);if(y>C)for(;_<=w;)n.insertBefore(d(h[_]=$(h[_++]),l,o),(a=g[y])&&a.node);else if(_>w)for(;y<=C;)n.removeChild(g[y++].node);else{for(var N={},E={},k=y;k<=C;k++)null!=(f=g[k].key)&&(N[f]=g[k]);for(;_<=w;){if(f=u(a=g[y]),p=u(h[_]=$(h[_],a)),E[f]||null!=p&&p===u(g[y+1])){null==f&&n.removeChild(a.node),y++;continue}null==p||1===r.type?(null==f&&(v(n,a&&a.node,a,h[_],l,o),_++),y++):(f===p?(v(n,a.node,a,h[_],l,o),E[p]=!0,y++):null!=(i=N[p])?(v(n,n.insertBefore(i.node,a&&a.node),i,h[_],l,o),E[p]=!0):v(n,a&&a.node,null,h[_],l,o),_++)}for(;y<=C;)null==u(a=g[y++])&&n.removeChild(a.node);for(var k in N)null==E[k]&&n.removeChild(N[k].node)}}return t.node=n},p=(e,n)=>{for(var r in e)if(e[r]!==n[r])return!0;for(var r in n)if(e[r]!==n[r])return!0},$=(e,n)=>!0!==e&&!1!==e&&e?"function"==typeof e.tag?((!n||null==n.memo||p(n.memo,e.memo))&&((n=e.tag(e.memo)).memo=e.memo),n):e:h(""),c=n=>3===n.nodeType?h(n.nodeValue,n):m(n.nodeName.toLowerCase(),e,t.call(n.childNodes,c),1,n),m=(e,{key:n,...r},t,l,o)=>({tag:e,props:r,key:n,children:t,type:l,node:o}),g=(e,n)=>({tag:e,memo:n}),h=(r,t)=>m(r,e,n,3,t),y=(r,{class:t,...o},a=n)=>m(r,{...o,...t?{class:i(t)}:e},l(a)?a:[a]),_=({node:n,view:t,subscriptions:i,dispatch:a=r,init:u=e})=>{var s,d,p=n&&c(n),$=[],m=e=>{s!==e&&(null==(s=e)&&(a=i=g=r),i&&($=f($,i(s),a)),t&&!d&&o(g,d=!0))},g=()=>n=v(n.parentNode,n,p,p=t(s),h,d=!1),h=function(e){a(this.events[e.type],e)};return(a=a((e,n)=>"function"==typeof e?a(e(s,n)):l(e)?"function"==typeof e[0]?a(e[0],e[1]):e.slice(1).map(e=>e&&!0!==e&&(e[0]||e)(a,e[1]),m(e[0])):m(e)))(u),a};return{memo:g,text:h,h:y,app:_}})();
+  </script>
+  <script>
+    const { app, text, memo, h } = hyperapp;
+
+    const randomHex = () => "0123456789ABCDEF"[Math.floor(Math.random() * 16)]
+    const randomColor = () => "#" + Array.from({ length: 6 }, randomHex).join("")
+
+    const listView = (list) =>
+      h("p", {
+        style: {
+          backgroundColor: randomColor(),
+          color: randomColor(),
+        },
+      }, text(list))
+
+    app({
+      node: document.getElementById("app"),
+      dispatch: dispatch => (action, e) => {
+        if (typeof action === 'function') {
+          console.log('DISPATCH: ', action.name || action)
+        }
+        dispatch(action, e);
+      },
+      init: { 
+        names: ['lee', 'park', 'kim'], 
+        clickCnt: 0
+      },
+      view:({ names, clickCnt }) => (
+        h('main', {}, [
+          h('h1', {}, text('hello world')),
+          h('div', {}, [
+            h('button', {
+              class: `${clickCnt}`,
+              onclick: (state) => {
+                return {
+                  ...state,
+                  clickCnt: clickCnt+1,
+                  names: names.slice(1),
+                }
+              }
+            }, text(`delete one ::: click cnt - ${clickCnt}`)),
+            h('ul', {}, names.map(name => h('li', {}, text(name)))),
+          ]),
+          h('hr', {}, []),
+          h('div', {}, [
+            h('button', {
+              onclick: (state) => ({ ...state }),
+            }, text('reload')),
+            listView(names),
+            memo(listView, names),
+          ])
+        ])
+      ),
+    });
+  </script>
+</body>
+</html>
