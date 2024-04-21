@@ -64,18 +64,6 @@ import './modules/style.module.js';
           templateUrl: './templates/resource/grouping.htm',
           controller: 'ResourceGroupingCtrl',
         })
-        .when('/bidding', { 
-          templateUrl: './templates/bidding/index.htm', 
-          controller: 'BiddingCtrl',
-        })
-        .when('/bidding/dayahead', { 
-          templateUrl: './templates/bidding/dayahead.htm', 
-          controller: 'BiddingDayaheadCtrl',
-        })
-        .when('/bidding/realtime', { 
-          templateUrl: './templates/bidding/realtime.htm', 
-          controller: 'BiddingRealtimeCtrl',
-        })
         .otherwise({
           redirectTo: '/'
         });
@@ -253,7 +241,28 @@ import './modules/style.module.js';
         })
       }, 1000 * 60);
     })
-    .controller('GroupBiddingDetailDayaheadCtrl', function($scope, $routeParams, $q, group, dayahead, realtime, meter, utility) {
+    .controller('GroupBiddingDetailDayaheadCtrl', function($scope, $routeParams, $q, $log, group, dayahead, realtime, meter, utility) {
+      console.log('!!');
+      group.findAll()
+        .then(
+          function(groups) {
+            $log.debug(groups);
+            dayahead.bidding(
+              groups[0].id,
+              '2024-03-29',
+              true,
+            )
+              .then(
+                function(res) {
+                  $log.debug(res);
+                }
+              )
+          }
+        );
+  
+      utility.interval($scope, () => {
+        console.log('BiddingDayaheadCtrl');
+      }, 3000);
     })
     .controller('GroupBiddingDetailRealtimeCtrl', function($scope, $routeParams, $q, group, dayahead, realtime, meter, utility) {
     })
@@ -417,36 +426,4 @@ import './modules/style.module.js';
     .controller('ResourceGroupingCtrl', function($scope) {
       // console.log($scope);
     })
-    .controller('BiddingCtrl', function($scope) {
-      console.log($scope);
-    })
-    .controller('BiddingDayaheadCtrl', function($scope, group, dayahead, utility, $log) {
-      console.log($scope);
-  
-      group.findAll()
-        .then(
-          function(groups) {
-            $log.debug(groups);
-            dayahead.bidding(
-              groups[0].id,
-              '2024-03-29',
-              true,
-            )
-              .then(
-                function(res) {
-                  $log.debug(res);
-                }
-              )
-          }
-        );
-  
-      utility.interval($scope, () => {
-        console.log('BiddingDayaheadCtrl');
-      }, 3000);
-    })
-    .controller('BiddingRealtimeCtrl', function($scope, utility) {
-      utility.interval($scope, () => {
-        console.log('BiddingRealtimeCtrl');
-      }, 3000);
-    });  
 })(window.angular);

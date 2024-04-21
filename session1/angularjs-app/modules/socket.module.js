@@ -7,12 +7,13 @@
       this.connect = function(handler) {
         try {
           ws = new WebSocket('wss://apidev.vpphaezoom.com/ws/meter/');
+          
 
           ws.onclose = function() {
           }
 
           ws.onerror = function(err) {
-            // console.error(err);
+            console.error(err);
           }
 
           ws.onmessage = async function(evt) {

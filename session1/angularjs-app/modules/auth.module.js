@@ -55,7 +55,7 @@
               const access = res.data.access;
               $http.defaults.headers.common.Authorization = `Bearer ${access}`;
               $cookies.remove('X-Authorization');
-              $cookies.put('X-Authorization', access);
+              $cookies.put('X-Authorization', `Bearer ${access}`);
               $rootScope.signed = true;
               $rootScope.user = _signmanagerProvider.getInfo(access);
               meta.loadList();
